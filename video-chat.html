@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Omegle Clone</title>
+    <link rel="stylesheet" href="./css/style.css" />
+  </head>
+  <body>
+    <header>
+      <nav>
+        <div class="container">
+          <img src="./Assets/images/logo.png" alt="" />
+          <img src="./Assets/images/Moto.png" alt="" />
+          <p>35000+ online</p>
+        </div>
+      </nav>
+    </header>
+    <main class="video-chat-main-container">
+      <!--  Video content  -->
+      <div class="video-chat-container">
+        <div class="video-tag-container">
+          <div class="videos">
+            <video
+              src=""
+              class="video-player"
+              id="user-1"
+              autoplay="autoplay"
+              playsinnline="playsinnline"
+            ></video>
+            <video
+              src=""
+              class="video-player"
+              id="user-1"
+              autoplay="autoplay"
+              playsinnline="playsinnline"
+              style="border-top: 2px solid white"
+            ></video>
+          </div>
+        </div>
+        <div class="chat-container">
+          <div class="chat-text-container">
+            <p>You are now chatting with random stranger</p>
+            <p>You both speak same language - English</p>
+            <hr class="horizontal-divider" />
+            <p class="chat-text-area"></p>
+          </div>
+          <div class="next-chat-container">
+            <div class="next-chat">
+              <div>Next</div>
+            </div>
+            <div class="type-message">
+              <textarea name="" id="msg-input" cols="30" rows="5"></textarea>
+            </div>
+            <div class="msg-send-button">Send</div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
