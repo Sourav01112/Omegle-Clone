@@ -3,10 +3,13 @@
 let peerConnection;
 let localStream;
 let username;
+let remoteUser;
 // getting complete URL
 let url = new URL(window.location.href);
 username = url.searchParams.get("username");
+remoteUser = url.searchParams.get("remoteuser");
 /* For getting http://localhost:8080/video-chat?username=Sourav */
+/* http://localhost:8080/video-chat?username=Sourav%20Chaudhary&remoteuser=Germany */
 // alert(username);
 
 // media permission
@@ -18,6 +21,7 @@ let init = async () => {
   });
   // assigned localStream to user-1 which is local in video-chat.ejs
   document.getElementById("user-1").srcObject = localStream;
+  createOffer();
 };
 
 // init();
@@ -49,23 +53,15 @@ let servers = {
 };
 // ICE servers are used to facilitate the establishment of peer-to-peer connections between clients in real-time applications. The [ stun1.1.google.com:19302 ] and  [ stun2.1.google.com:19302 ] URLs are commonly used Google STUN servers
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 let createOffer = async () => {
   peerConnection = new RTCPeerConnection(servers);
 
   let offer = await peerConnection.createOffer();
   // peerConnection will hold the info. of all peer connection for every single user
+  await peerConnection.setLocalDescription(offer);
+  socket.emit("offerSentToRemote", {
+    username: username, // local User : Sourav
+    remoteUser: remoteUser,
+    offer: peerConnection.localDescription,
+  });
 };

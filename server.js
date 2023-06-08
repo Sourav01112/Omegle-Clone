@@ -38,7 +38,7 @@ var userConnection = [];
 // receiving username with help of socket.emit
 io.on("connection", (socket) => {
   console.log("Socket ID:", socket.id);
-  // to listen to the event "userConnect"
+  // to listen to the event "userConnect" (LOCAL USER)
   socket.on("userConnect", (data) => {
     console.log("Logged in User", data.displayName);
 
@@ -52,22 +52,29 @@ io.on("connection", (socket) => {
     // userCount will know how many user are browsing
     console.log("userCount", userCount);
   });
-});
+  // http://localhost:8080/video-chat?username=Sourav%20Chaudhary
 
-// http://localhost:8080/video-chat?username=Sourav%20Chaudhary
-
-/* -- Socket ID: enfVZedgoWXaRwo7AAAB
+  /* -- Socket ID: enfVZedgoWXaRwo7AAAB
 Logged in User Sourav
 userCount 1 
 -- Socket ID: vTfMl8qjmAMXw7MUAAAF
 Logged in User Sourav Chaudhary
 userCount 3
 */
+  // ********** connected client Side to Server Side till here ********* //
 
-// ********** connected client Side to Server Side here ********* //
+  /*  Web RTC browser to browser connection : (Remote)
+ 1st. step : sending offer in index.js */
 
-/*  Web RTC browser to browser connection : 
- 1st. step : sending offer in index.js 
- 
- 
- */
+  // to listen to the event "offerSentToRemote" event (REMOTE USER)
+
+  socket.on("offerSentToRemote", (data) => {
+    var offerReceiver = userConnection.find(
+      (ele) => ele.user_id === data.remoteUser
+    );
+    if (offerReceiver) {
+      console.log("OfferReceiver user is: ", offerReceiver.connectionID);
+      socket.to(offerReceiver.connectionID).emit("ReceiveOffer", data);
+    }
+  });
+});
