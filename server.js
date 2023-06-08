@@ -25,3 +25,49 @@ app.use("/", require("./Server-backend/routes/router"));
 var server = app.listen(PORT, () => {
   console.log(`server is running on http://localhost:${PORT}`);
 });
+
+// getting username from Socket to server (passing)
+const io = require("socket.io")(server, {
+  // to avoid mismatch (false by default)
+  allowEIO3: true,
+});
+
+// stores all user connection
+var userConnection = [];
+
+// receiving username with help of socket.emit
+io.on("connection", (socket) => {
+  console.log("Socket ID:", socket.id);
+  // to listen to the event "userConnect"
+  socket.on("userConnect", (data) => {
+    console.log("Logged in User", data.displayName);
+
+    //this 'data' holds the info. sent from client Side
+    userConnection.push({
+      connectionID: socket.id,
+      user_id: data.displayName,
+    });
+
+    var userCount = userConnection.length;
+    // userCount will know how many user are browsing
+    console.log("userCount", userCount);
+  });
+});
+
+// http://localhost:8080/video-chat?username=Sourav%20Chaudhary
+
+/* -- Socket ID: enfVZedgoWXaRwo7AAAB
+Logged in User Sourav
+userCount 1 
+-- Socket ID: vTfMl8qjmAMXw7MUAAAF
+Logged in User Sourav Chaudhary
+userCount 3
+*/
+
+// ********** connected client Side to Server Side here ********* //
+
+/*  Web RTC browser to browser connection : 
+ 1st. step : sending offer in index.js 
+ 
+ 
+ */
