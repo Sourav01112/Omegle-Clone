@@ -1,0 +1,31 @@
+{
+  "name": "omegle-clone",
+  "version": "1.0.0",
+  "description": "Omegle Clone using HTML, CSS, JS, WebRTC, Socket IO, MongoDB (with MVC Structure)",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sourav01112/Omegle-Clone.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Sourav01112/Omegle-Clone/issues"
+  },
+  "homepage": "https://github.com/Sourav01112/Omegle-Clone#readme",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "dotenv": "^16.1.4",
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "mongoose": "^7.2.2",
+    "morgan": "^1.10.0",
+    "nodemon": "^2.0.22",
+    "socket.io": "^4.6.2"
+  }
+}
