@@ -12,6 +12,9 @@ remoteUser = url.searchParams.get("remoteuser");
 /* http://localhost:8080/video-chat?username=Sourav%20Chaudhary&remoteuser=Germany */
 // alert(username);
 
+//  to start the Media
+// init();
+
 // media permission
 let init = async () => {
   localStream = await navigator.mediaDevices.getUserMedia({
@@ -23,8 +26,6 @@ let init = async () => {
   document.getElementById("user-1").srcObject = localStream;
   createOffer();
 };
-
-// init();
 
 // Implementing Socket.IO here
 
@@ -65,3 +66,34 @@ let createOffer = async () => {
     offer: peerConnection.localDescription,
   });
 };
+
+// Will be triggered for the Remote User Client Side
+let createAnswer = async (data) => {
+  remoteUser = data.username;
+  peerConnection = new RTCPeerConnection(servers);
+  // this will remote Description for User-2
+  await peerConnection.setRemoteDescription(data.offer);
+  let answer = await peerConnection.createAnswer();
+
+  // send the user-1 answer to receive as remote description from user-2
+  socket.emit("answerSentToUser_1", {
+    answer: answer,
+    sender: data.remoteUser,
+    receiver: data.username, // user-1
+  });
+};
+
+socket.on("ReceiveOffer", function (data) {
+  createAnswer(data);
+});
+
+let addAnswer = async (data) => {
+  if (!peerConnection.currentRemoteDescription) {
+    // if there is no remote desc. in peer connection yet, then only set the set the answer as remoteDesc. for User-1
+    peerConnection.setRemoteDescription(data.answer);
+  }
+};
+
+socket.on("ReceiveAnswer", function (data) {
+  addAnswer(data);
+});

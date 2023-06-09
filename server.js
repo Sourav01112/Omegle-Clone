@@ -77,4 +77,14 @@ userCount 3
       socket.to(offerReceiver.connectionID).emit("ReceiveOffer", data);
     }
   });
+  socket.on("answerSentToUser_1", (data) => {
+    var answerReceiver = userConnection.find(
+      (ele) => ele.user_id === data.receiver
+      // this receiver is User-1
+    );
+    if (answerReceiver) {
+      console.log("answerReceiver user is: ", answerReceiver.connectionID);
+      socket.to(answerReceiver.connectionID).emit("ReceiveAnswer", data);
+    }
+  });
 });
