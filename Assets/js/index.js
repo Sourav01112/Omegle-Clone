@@ -61,14 +61,15 @@ let createPeerConnection = async () => {
   remoteStream = new MediaStream();
 
   document.getElementById("user-2").srcObject = remoteStream;
+
   localStream.getTracks().forEach((track) => {
     peerConnection.addTrack(track, localStream);
   });
 
   // listen the change
   // firing event
-  peerConnection.ontrack = async (e) => {
-    e.streams[0].getTracks().forEach((track) => {
+  peerConnection.ontrack = async (event) => {
+    event.streams[0].getTracks().forEach((track) => {
       remoteStream.addTrack(track);
     });
   };
@@ -83,12 +84,12 @@ let createPeerConnection = async () => {
   };
 
   //  Exchanging the ICE Candidate
-  peerConnection.onicecandidate = async (e) => {
-    if (e.candidate) {
+  peerConnection.onicecandidate = async (event) => {
+    if (event.candidate) {
       socket.emit("candidateSentToUser", {
         username: username,
         remoteUser: remoteUser,
-        iceCandidateData: e.candidate,
+        iceCandidateData: event.candidate,
       });
     }
   };
