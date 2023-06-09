@@ -4,6 +4,7 @@ let peerConnection;
 let localStream;
 let username;
 let remoteUser;
+let remoteStream;
 // getting complete URL
 let url = new URL(window.location.href);
 username = url.searchParams.get("username");
@@ -12,8 +13,8 @@ remoteUser = url.searchParams.get("remoteuser");
 /* http://localhost:8080/video-chat?username=Sourav%20Chaudhary&remoteuser=Germany */
 // alert(username);
 
-//  to start the Media
-// init();
+// **** to start the Media
+init();
 
 // media permission
 let init = async () => {
@@ -53,6 +54,44 @@ let servers = {
   ],
 };
 // ICE servers are used to facilitate the establishment of peer-to-peer connections between clients in real-time applications. The [ stun1.1.google.com:19302 ] and  [ stun2.1.google.com:19302 ] URLs are commonly used Google STUN servers
+
+let createPeerConnection = async () => {
+  peerConnection = new RTCPeerConnection(servers);
+
+  remoteStream = new MediaStream();
+
+  document.getElementById("user-2").srcObject = remoteStream;
+  localStream.getTrack().forEach((track) => {
+    peerConnection.addTrack(track, localStream);
+  });
+
+  // listen the change
+  // firing event
+  peerConnection.ontrack = async (e) => {
+    e.streams[0].getTracks().forEach((track) => {
+      remoteStream.addTrack(track);
+    });
+  };
+
+  // to manage the inactivity (if connection is closed)
+  remoteStream.oninactive = () => {
+    remoteStream.getTracks().forEach((track) => {
+      track.enabled = !track.enabled;
+    });
+    // closing all the connection : while inactivity
+    peerConnection.close();
+  };
+
+  peerConnection.onicecandidate = async (e) => {
+    if (e.candidate) {
+      socket.emit("candidateSentToUser", {
+        username: username,
+        remoteUser: remoteUser,
+        iceCandidateData: e.candidate,
+      });
+    }
+  };
+};
 
 let createOffer = async () => {
   peerConnection = new RTCPeerConnection(servers);
