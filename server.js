@@ -87,4 +87,33 @@ userCount 3
       socket.to(answerReceiver.connectionID).emit("ReceiveAnswer", data);
     }
   });
+
+  socket.on("candidateSentToUser", (data) => {
+    var candidateReceiver = userConnection.find(
+      (ele) => ele.user_id === data.remoteUser
+    );
+    if (candidateReceiver) {
+      console.log(
+        "candidateReceiver user is: ",
+        candidateReceiver.connectionId
+      );
+      socket.to(candidateReceiver.connectionId).emit("candidateReceiver", data);
+    }
+  });
+
+  socket.on("disconnect", () => {
+    console.log("User disconnected");
+    var disUser = userConnection.find((p) => (p.connectionId = socket.id));
+    if (disUser) {
+      userConnection = userConnection.filter(
+        (ele) => (ele.connectionId = !socket.id)
+      );
+      console.log(
+        "Rest users username are: ",
+        userConnection.map(function (user) {
+          return user.user_id;
+        })
+      );
+    }
+  });
 });

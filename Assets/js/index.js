@@ -1,5 +1,5 @@
 // alert("Hello, Javascript is attached now!");
-
+//  CLIENT SIDE
 let peerConnection;
 let localStream;
 let username;
@@ -14,19 +14,19 @@ remoteUser = url.searchParams.get("remoteuser");
 // alert(username);
 
 // **** to start the Media
-init();
 
 // media permission
 let init = async () => {
   localStream = await navigator.mediaDevices.getUserMedia({
     // below means video and audio will be captured
     video: true,
-    audio: true,
+    audio: false,
   });
   // assigned localStream to user-1 which is local in video-chat.ejs
   document.getElementById("user-1").srcObject = localStream;
   createOffer();
 };
+init();
 
 // Implementing Socket.IO here
 
@@ -61,7 +61,7 @@ let createPeerConnection = async () => {
   remoteStream = new MediaStream();
 
   document.getElementById("user-2").srcObject = remoteStream;
-  localStream.getTrack().forEach((track) => {
+  localStream.getTracks().forEach((track) => {
     peerConnection.addTrack(track, localStream);
   });
 
@@ -82,6 +82,7 @@ let createPeerConnection = async () => {
     peerConnection.close();
   };
 
+  //  Exchanging the ICE Candidate
   peerConnection.onicecandidate = async (e) => {
     if (e.candidate) {
       socket.emit("candidateSentToUser", {
@@ -93,9 +94,10 @@ let createPeerConnection = async () => {
   };
 };
 
-let createOffer = async () => {
-  peerConnection = new RTCPeerConnection(servers);
+// ********** Create OFFER ************
 
+let createOffer = async () => {
+  createPeerConnection();
   let offer = await peerConnection.createOffer();
   // peerConnection will hold the info. of all peer connection for every single user
   await peerConnection.setLocalDescription(offer);
@@ -106,14 +108,18 @@ let createOffer = async () => {
   });
 };
 
+// ********** Creating ANSWER ************
+
 // Will be triggered for the Remote User Client Side
 let createAnswer = async (data) => {
   remoteUser = data.username;
-  peerConnection = new RTCPeerConnection(servers);
+
+  createPeerConnection();
   // this will remote Description for User-2
   await peerConnection.setRemoteDescription(data.offer);
   let answer = await peerConnection.createAnswer();
-
+  // setting the answer as localDescription for remoteUser
+  await peerConnection.setLocalDescription(answer);
   // send the user-1 answer to receive as remote description from user-2
   socket.emit("answerSentToUser_1", {
     answer: answer,
@@ -122,6 +128,8 @@ let createAnswer = async (data) => {
   });
 };
 
+//  ************* Receiving OFFER ***********
+// Listening
 socket.on("ReceiveOffer", function (data) {
   createAnswer(data);
 });
@@ -133,6 +141,16 @@ let addAnswer = async (data) => {
   }
 };
 
+//  ************* Receiving ANSWER ***********
+
+// Listening
 socket.on("ReceiveAnswer", function (data) {
   addAnswer(data);
+});
+
+//  ************* Candidate RECEIVER ***********
+
+// Listening
+socket.on("candidateReceiver", function (data) {
+  peerConnection.addIceCandidate(data.iceCandidateData);
 });
